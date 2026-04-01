@@ -23,7 +23,7 @@ days:
       - id: start_video
         delay_minutes: 5
         type: video
-        file_id: "PUT_VIDEO_FILE_ID_DAY1"
+        file_id: "AAMCAgADGQEC-eeKaczNVaKW1GHL4Me0WW6GlU0b-gUAAvN4AAIOiPhKEyaRZ_61VDwBAAdtAAM6BA"
         caption: |
           Вот стартовая практика.
 
@@ -63,7 +63,7 @@ days:
       - id: day2_audio
         time: "13:00"
         type: audio
-        file_id: "PUT_AUDIO_FILE_ID_DAY2"
+        file_id: "AgAD4ngAAtnvKEs"
         caption: |
           Сегодня тебе короткое аудио на настрой и внутреннюю опору.
 
