@@ -26,6 +26,8 @@ assert TOKEN, "BOT_TOKEN is missing"
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+print("🚀 BOT STARTED", flush=True)
+
 
 # === STORAGE ===
 def load_users():
@@ -49,7 +51,6 @@ def load_program():
 
 
 users = load_users()
-program = load_program()
 
 
 def get_user(user_id: int):
@@ -61,6 +62,24 @@ def get_user(user_id: int):
             "answers": {}
         }
     return users[uid]
+
+
+# === DEBUG FILE ID HANDLER ===
+@dp.message()
+async def debug_file_id(message: Message):
+    print("📩 MESSAGE RECEIVED", flush=True)
+
+    if message.video:
+        await message.answer(f"🎥 VIDEO FILE_ID:\n{message.video.file_id}")
+
+    elif message.document:
+        await message.answer(f"📦 DOCUMENT FILE_ID:\n{message.document.file_id}")
+
+    elif message.audio:
+        await message.answer(f"🎧 AUDIO FILE_ID:\n{message.audio.file_id}")
+
+    else:
+        await message.answer("🤷 НЕ РАСПОЗНАЛ ФАЙЛ")
 
 
 # === SEND EVENT ===
@@ -116,7 +135,7 @@ async def cmd_start(message: Message):
     await message.answer("🚀 Старт. Добро пожаловать.")
 
 
-# === NEXT (DEBUG) ===
+# === NEXT ===
 @dp.message(Command("next"))
 async def debug_next(message: Message):
     user = get_user(message.from_user.id)
@@ -244,30 +263,16 @@ async def scheduler():
                             save_users(users)
 
         except Exception as e:
-            print(f"SCHEDULER ERROR: {e}", flush=True)
+            print(f"❌ SCHEDULER ERROR: {e}", flush=True)
 
         await asyncio.sleep(60)
 
 
 # === MAIN ===
 async def main():
-    print("🚀 BOT STARTED", flush=True)
     asyncio.create_task(scheduler())
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-@dp.message()
-async def debug_file_id(message: Message):
-    if message.video:
-        await message.answer(f"VIDEO FILE_ID:\n{message.video.file_id}")
-    elif message.audio:
-        await message.answer(f"AUDIO FILE_ID:\n{message.audio.file_id}")
-
-
-
-
