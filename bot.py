@@ -258,3 +258,16 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+
+@dp.message()
+async def debug_file_id(message: Message):
+    if message.video:
+        await message.answer(f"VIDEO FILE_ID:\n{message.video.file_id}")
+    elif message.audio:
+        await message.answer(f"AUDIO FILE_ID:\n{message.audio.file_id}")
+
+
+
+
