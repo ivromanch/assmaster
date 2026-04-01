@@ -59,27 +59,43 @@ def get_user(user_id: int):
         users[uid] = {
             "started_at": None,
             "sent_events": [],
-            "answers": {}
+            "answers": {},
+            "debug_file_mode": False
         }
     return users[uid]
 
 
-# === DEBUG FILE ID HANDLER ===
+# === FILE ID MODE ===
+@dp.message(Command("fileid"))
+async def enable_file_mode(message: Message):
+    user = get_user(message.from_user.id)
+    user["debug_file_mode"] = True
+    save_users(users)
+
+    await message.answer("📥 Отправь файл (видео/аудио/документ)")
+
+
 @dp.message()
-async def debug_file_id(message: Message):
-    print("📩 MESSAGE RECEIVED", flush=True)
+async def handle_files(message: Message):
+    user = get_user(message.from_user.id)
+
+    if not user.get("debug_file_mode"):
+        return  # не мешаем остальной логике
 
     if message.video:
-        await message.answer(f"🎥 VIDEO FILE_ID:\n{message.video.file_id}")
+        await message.answer(f"🎥 VIDEO:\n{message.video.file_id}")
 
     elif message.document:
-        await message.answer(f"📦 DOCUMENT FILE_ID:\n{message.document.file_id}")
+        await message.answer(f"📦 DOCUMENT:\n{message.document.file_id}")
 
     elif message.audio:
-        await message.answer(f"🎧 AUDIO FILE_ID:\n{message.audio.file_id}")
+        await message.answer(f"🎧 AUDIO:\n{message.audio.file_id}")
 
     else:
-        await message.answer("🤷 НЕ РАСПОЗНАЛ ФАЙЛ")
+        await message.answer("🤷 Не понял файл")
+
+    user["debug_file_mode"] = False
+    save_users(users)
 
 
 # === SEND EVENT ===
@@ -170,7 +186,7 @@ async def debug_next(message: Message):
                 await message.answer(f"👉 DEBUG: {event_id}")
                 return
 
-    await message.answer("Все события уже отправлены")
+    await message.answer("Все события отправлены")
 
 
 # === RESET ===
