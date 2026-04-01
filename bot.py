@@ -36,7 +36,7 @@ def load_users():
     with open(USERS_FILE, "r", encoding="utf-8") as f:
         try:
             return json.load(f)
-        except:
+        except Exception:
             return {}
 
 
@@ -60,42 +60,9 @@ def get_user(user_id: int):
             "started_at": None,
             "sent_events": [],
             "answers": {},
-            "debug_file_mode": False
+            "debug_file_mode": False,
         }
     return users[uid]
-
-
-# === FILE ID MODE ===
-@dp.message(Command("fileid"))
-async def enable_file_mode(message: Message):
-    user = get_user(message.from_user.id)
-    user["debug_file_mode"] = True
-    save_users(users)
-
-    await message.answer("📥 Отправь файл (видео/аудио/документ)")
-
-
-@dp.message(~Command())
-async def handle_files(message: Message):
-    user = get_user(message.from_user.id)
-
-    if not user.get("debug_file_mode"):
-        return  # не мешаем остальной логике
-
-    if message.video:
-        await message.answer(f"🎥 VIDEO:\n{message.video.file_id}")
-
-    elif message.document:
-        await message.answer(f"📦 DOCUMENT:\n{message.document.file_id}")
-
-    elif message.audio:
-        await message.answer(f"🎧 AUDIO:\n{message.audio.file_id}")
-
-    else:
-        await message.answer("🤷 Не понял файл")
-
-    user["debug_file_mode"] = False
-    save_users(users)
 
 
 # === SEND EVENT ===
@@ -109,35 +76,37 @@ async def send_event(user_id: int, day_num: int, event: dict):
         await bot.send_video(
             chat_id=user_id,
             video=event["file_id"],
-            caption=event.get("caption")
+            caption=event.get("caption"),
         )
 
     elif event_type == "audio":
         await bot.send_audio(
             chat_id=user_id,
             audio=event["file_id"],
-            caption=event.get("caption")
+            caption=event.get("caption"),
         )
 
     elif event_type == "buttons":
         kb = InlineKeyboardMarkup(
-            inline_keyboard=[[
-                InlineKeyboardButton(
-                    text=b["text"],
-                    callback_data=b["action"]
-                )
-                for b in event["buttons"]
-            ]]
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text=b["text"],
+                        callback_data=b["action"],
+                    )
+                    for b in event["buttons"]
+                ]
+            ]
         )
 
         await bot.send_message(
             user_id,
             event["text"],
-            reply_markup=kb
+            reply_markup=kb,
         )
 
 
-# === START ===
+# === COMMANDS ===
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
     user = get_user(message.from_user.id)
@@ -145,13 +114,13 @@ async def cmd_start(message: Message):
     user["started_at"] = datetime.utcnow().isoformat()
     user["sent_events"] = []
     user["answers"] = {}
+    user["debug_file_mode"] = False
 
     save_users(users)
 
     await message.answer("🚀 Старт. Добро пожаловать.")
 
 
-# === NEXT ===
 @dp.message(Command("next"))
 async def debug_next(message: Message):
     user = get_user(message.from_user.id)
@@ -189,7 +158,6 @@ async def debug_next(message: Message):
     await message.answer("Все события отправлены")
 
 
-# === RESET ===
 @dp.message(Command("reset"))
 async def debug_reset(message: Message):
     user = get_user(message.from_user.id)
@@ -197,13 +165,47 @@ async def debug_reset(message: Message):
     user["started_at"] = datetime.utcnow().isoformat()
     user["sent_events"] = []
     user["answers"] = {}
+    user["debug_file_mode"] = False
 
     save_users(users)
 
     await message.answer("🔄 Сброс. Начни заново с /next")
 
 
-# === CALLBACK ===
+@dp.message(Command("fileid"))
+async def enable_file_mode(message: Message):
+    user = get_user(message.from_user.id)
+    user["debug_file_mode"] = True
+    save_users(users)
+
+    await message.answer("📥 Отправь файл сюда: видео, аудио или документ")
+
+
+# === FILE HANDLER ===
+@dp.message(F.video | F.document | F.audio)
+async def handle_files(message: Message):
+    user = get_user(message.from_user.id)
+
+    if not user.get("debug_file_mode"):
+        return
+
+    if message.video:
+        await message.answer(f"🎥 VIDEO FILE_ID:\n{message.video.file_id}")
+
+    elif message.document:
+        await message.answer(f"📦 DOCUMENT FILE_ID:\n{message.document.file_id}")
+
+    elif message.audio:
+        await message.answer(f"🎧 AUDIO FILE_ID:\n{message.audio.file_id}")
+
+    else:
+        await message.answer("🤷 Не понял файл")
+
+    user["debug_file_mode"] = False
+    save_users(users)
+
+
+# === CALLBACKS ===
 @dp.callback_query(F.data)
 async def callbacks_handler(callback: CallbackQuery):
     action_name = callback.data
@@ -268,7 +270,10 @@ async def scheduler():
 
                         elif "time" in event:
                             hh, mm = map(int, event["time"].split(":"))
-                            target_time = datetime.combine(now.date(), datetime.min.time()).replace(hour=hh, minute=mm)
+                            target_time = datetime.combine(
+                                now.date(),
+                                datetime.min.time(),
+                            ).replace(hour=hh, minute=mm)
 
                             if now >= target_time:
                                 should_send = True
