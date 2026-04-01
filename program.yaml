@@ -23,7 +23,7 @@ days:
       - id: start_video
         delay_minutes: 5
         type: video
-        file_id: "AAMCAgADGQEC-eeKaczNVaKW1GHL4Me0WW6GlU0b-gUAAvN4AAIOiPhKEyaRZ_61VDwBAAdtAAM6BA"
+        file_id: "BAACAgIAAxkBAAMwaczbVZPdbx1jxgu9RDpkI5Au7QsAAvN4AAIOiPhKP6zgfuKQWF06BA"
         caption: |
           Вот стартовая практика.
 
@@ -63,7 +63,7 @@ days:
       - id: day2_audio
         time: "13:00"
         type: audio
-        file_id: "AgAD4ngAAtnvKEs"
+        file_id: "CQACAgIAAxkBAANCaczehSmjPDFD4iOPuRvgNCsYtZcAAuJ4AALZ7yhLF-odECyLNMs6BA"
         caption: |
           Сегодня тебе короткое аудио на настрой и внутреннюю опору.
 
@@ -91,7 +91,7 @@ days:
       - id: day3_audio
         time: "13:00"
         type: audio
-        file_id: "PUT_AUDIO_FILE_ID_DAY3"
+        file_id: "CQACAgIAAxkBAANCaczehSmjPDFD4iOPuRvgNCsYtZcAAuJ4AALZ7yhLF-odECyLNMs6BA"
         caption: |
           Сегодня ещё одно короткое аудио.
           Слушай и возвращайся в тело.
