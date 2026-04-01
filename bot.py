@@ -75,7 +75,7 @@ async def enable_file_mode(message: Message):
     await message.answer("📥 Отправь файл (видео/аудио/документ)")
 
 
-@dp.message()
+@dp.message(~Command())
 async def handle_files(message: Message):
     user = get_user(message.from_user.id)
 
