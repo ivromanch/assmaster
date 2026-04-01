@@ -228,3 +228,50 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+@dp.message(Command("next"))
+async def debug_next(message: Message):
+    user = get_user(message.from_user.id)
+
+    if not user.get("started_at"):
+        await message.answer("Сначала нажми /start")
+        return
+
+    program_data = load_program()
+    days = program_data.get("days", {})
+
+    started_at = datetime.fromisoformat(user["started_at"])
+    now = datetime.utcnow()
+    current_day = (now.date() - started_at.date()).days + 1
+
+    # ищем следующий неотправленный event
+    for day_str, day_data in days.items():
+        day_num = int(day_str)
+
+        if day_num < current_day:
+            continue
+
+        events = day_data.get("events", [])
+
+        for event in events:
+            event_id = f"{day_num}:{event['id']}"
+
+            if event_id not in user["sent_events"]:
+                await send_event(message.from_user.id, day_num, event)
+                user["sent_events"].append(event_id)
+                save_users(users)
+
+                await message.answer(f"👉 Debug: отправлен {event_id}")
+                return
+
+    await message.answer("Все события уже отправлены")
+
+@dp.message(Command("reset"))
+async def debug_reset(message: Message):
+    user = get_user(message.from_user.id)
+    user["started_at"] = datetime.utcnow().isoformat()
+    user["sent_events"] = []
+    user["answers"] = {}
+    save_users(users)
+
+    await message.answer("🔄 Сброс. Начинай заново с /next или жди сценарий.")
