@@ -1,182 +1,180 @@
 days:
+
   1:
     events:
-      - id: welcome_1
+
+      - id: welcome
         delay_minutes: 0
         type: text
         text: |
-          Привет. Добро пожаловать в тест-драйв курса.
+          Привет.
 
-          Здесь мы не просто качаем ягодицы.
-          Мы собираем сильную, красивую и рабочую систему тела.
+          Это не просто курс "про жопу".
+          Это про тело, силу и ощущение себя.
 
-      - id: explain_1
+      - id: about_course
         delay_minutes: 1
         type: text
         text: |
-          Как всё устроено:
-          ты будешь получать короткие касания в течение дня —
-          тексты, иногда видео или аудио, и вечернюю отметку практики.
+          Как это работает:
 
-          Задача сейчас не идеальность, а ритм.
+          Каждый день ты будешь получать:
+          — короткие сообщения
+          — задания
+          — тренировки
 
-      - id: start_video
-        delay_minutes: 5
-        type: video
-        file_id: "BAACAgIAAxkBAAMwaczbVZPdbx1jxgu9RDpkI5Au7QsAAvN4AAIOiPhKP6zgfuKQWF06BA"
-        caption: |
-          Вот стартовая практика.
+          Твоя задача — не идеально.
+          А регулярно.
 
-          Сделай её сегодня в удобное время.
-          Главное сейчас — просто начать.
-
-      - id: evening_motivation
-        time: "19:00"
+      - id: how_to_train
+        delay_minutes: 2
         type: text
         text: |
-          На старте не нужно геройствовать.
+          Как тренироваться:
 
-          Сегодня задача простая:
-          сделать практику хотя бы в базовом объёме и отметить это здесь.
+          Лучше сделать немного, чем не сделать идеально.
 
-      - id: day1_check
+          Здесь важна регулярность и внимание к телу.
+
+      - id: main_training
+        delay_minutes: 3
+        type: video
+        file_id: "BAACAgIAAxkBAAOKac53Jd1gnOLG_JkikRPAgFP4F5wAAquTAAK9MnBKDu2pY0n34o86BA"
+        caption: |
+          Это основная тренировка.
+
+      - id: short_training
+        delay_minutes: 4
+        type: video
+        file_id: "BAACAgIAAxkBAAOOac53OOYfmZvwJ8DCx_rgFpbhS1MAArOTAAK9MnBK-zSym7rp_g06BA"
+        caption: |
+          Это короткая версия.
+
+      - id: pin_message
+        delay_minutes: 5
+        type: text
+        text: |
+          Закрепи эти видео.
+
+          Ты будешь возвращаться к ним каждый день.
+
+      - id: evening
         time: "21:00"
-        type: buttons
-        text: "Как сегодня с практикой?"
-        buttons:
-          - text: "Да, сделала"
-            action: "save_day1_done"
-          - text: "Нет, не сделала"
-            action: "save_day1_not_done"
+        type: text
+        text: |
+          Завтра начинаем.
+
+          Перед сном просто обрати внимание на тело.
+          Почувствуй его.
+
+---
 
   2:
     events:
-      - id: morning_motivation
+
+      - id: morning
         time: "09:00"
         type: text
         text: |
           Доброе утро.
 
-          Сегодня не нужно ждать идеального состояния.
-          Короткая практика, сделанная вовремя, работает лучше, чем бесконечная подготовка.
+          Сегодня начинаем.
 
-      - id: day2_audio
-        time: "13:00"
-        type: audio
-        file_id: "CQACAgIAAxkBAANCaczehSmjPDFD4iOPuRvgNCsYtZcAAuJ4AALZ7yhLF-odECyLNMs6BA"
-        caption: |
-          Сегодня тебе короткое аудио на настрой и внутреннюю опору.
+          Мини-задание:
+          обрати внимание, как ты чувствуешь своё тело.
 
-      - id: day2_check
+      - id: training
+        time: "12:00"
+        type: text
+        text: |
+          Сегодня короткая тренировка.
+
+      - id: check
         time: "21:00"
         type: buttons
-        text: "Удалось ли сегодня сделать практику?"
+        text: "Сделала сегодня тренировку?"
         buttons:
-          - text: "Да, сделала"
-            action: "save_day2_done"
-          - text: "Нет, не сделала"
-            action: "save_day2_not_done"
+          - text: "Да"
+            action: "done"
+          - text: "Нет"
+            action: "not_done"
+
+---
 
   3:
     events:
-      - id: morning_motivation
+
+      - id: morning
         time: "09:00"
         type: text
         text: |
           Новый день.
 
-          Сейчас важнее не интенсивность, а ритм.
-          Ты не доказываешь ничего миру — ты собираешь тело шаг за шагом.
+          Мини-задание:
+          попробуй не критиковать своё тело сегодня.
 
-      - id: day3_audio
-        time: "13:00"
-        type: audio
-        file_id: "CQACAgIAAxkBAANCaczehSmjPDFD4iOPuRvgNCsYtZcAAuJ4AALZ7yhLF-odECyLNMs6BA"
-        caption: |
-          Сегодня ещё одно короткое аудио.
-          Слушай и возвращайся в тело.
+      - id: training
+        time: "12:00"
+        type: text
+        text: |
+          Сегодня тоже короткая тренировка.
 
-      - id: day3_check
+      - id: check
         time: "21:00"
         type: buttons
-        text: "Сделала ли ты сегодня практику?"
+        text: "Получилось сделать?"
         buttons:
-          - text: "Да, сделала"
-            action: "save_day3_done"
-          - text: "Нет, не сделала"
-            action: "save_day3_not_done"
+          - text: "Да"
+            action: "done"
+          - text: "Нет"
+            action: "not_done"
+
+---
+
+  4:
+    events:
+
+      - id: morning
+        time: "09:00"
+        type: text
+        text: |
+          Сегодня возвращаем длинную тренировку.
+
+          Мини-задание:
+          почувствуй силу в теле.
+
+      - id: training
+        time: "12:00"
+        type: text
+        text: |
+          Сегодня основная тренировка.
+
+      - id: check
+        time: "21:00"
+        type: buttons
+        text: "Как сегодня?"
+        buttons:
+          - text: "Сделала"
+            action: "done"
+          - text: "Нет"
+            action: "not_done"
+
+---
 
 actions:
-  save_day1_done:
-    save_answer:
-      key: "day1_practice"
-      value: "done"
-    response:
-      type: text
-      text: |
-        Отлично.
 
-        Самое важное ты уже сделала:
-        не отложила контакт с телом на потом.
-
-        Завтра продолжим.
-
-  save_day1_not_done:
-    save_answer:
-      key: "day1_practice"
-      value: "not_done"
-    response:
-      type: text
-      text: |
-        Ничего страшного.
-
-        Тут не нужно включать чувство вины.
-        Просто спокойно возвращайся завтра.
-
-  save_day2_done:
-    save_answer:
-      key: "day2_practice"
-      value: "done"
+  done:
     response:
       type: text
       text: |
         Красиво.
 
-        Именно так и строится результат:
-        не рывком, а через повторение и накопление.
+        Именно так строится результат.
 
-  save_day2_not_done:
-    save_answer:
-      key: "day2_practice"
-      value: "not_done"
+  not_done:
     response:
       type: text
       text: |
-        Бывает.
+        Ничего страшного.
 
-        Не надо пытаться наверстать идеально.
-        Просто возвращайся в ритм завтра.
-
-  save_day3_done:
-    save_answer:
-      key: "day3_practice"
-      value: "done"
-    response:
-      type: text
-      text: |
-        Отличная работа.
-
-        Даже если тебе кажется, что это мелочь —
-        именно такие мелочи постепенно меняют тело.
-
-  save_day3_not_done:
-    save_answer:
-      key: "day3_practice"
-      value: "not_done"
-    response:
-      type: text
-      text: |
-        Это не провал.
-
-        Один пропуск ничего не ломает.
-        Главное — не выпадать из контакта с процессом совсем.
+        Просто возвращайся завтра.
