@@ -67,8 +67,6 @@ days:
           Перед сном просто обрати внимание на тело.
           Почувствуй его.
 
----
-
   2:
     events:
 
@@ -99,8 +97,6 @@ days:
           - text: "Нет"
             action: "not_done"
 
----
-
   3:
     events:
 
@@ -129,8 +125,6 @@ days:
           - text: "Нет"
             action: "not_done"
 
----
-
   4:
     events:
 
@@ -158,8 +152,6 @@ days:
             action: "done"
           - text: "Нет"
             action: "not_done"
-
----
 
 actions:
 
