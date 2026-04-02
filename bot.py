@@ -47,7 +47,9 @@ def save_users(users):
 
 def load_program():
     with open(PROGRAM_FILE, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        data = yaml.safe_load(f)
+    print("🔄 program.yaml reloaded", flush=True)
+    return data
 
 
 users = load_users()
@@ -142,9 +144,7 @@ async def debug_next(message: Message):
         if day_num < current_day:
             continue
 
-        events = day_data.get("events", [])
-
-        for event in events:
+        for event in day_data.get("events", []):
             event_id = f"{day_num}:{event['id']}"
 
             if event_id not in user["sent_events"]:
@@ -178,7 +178,7 @@ async def enable_file_mode(message: Message):
     user["debug_file_mode"] = True
     save_users(users)
 
-    await message.answer("📥 Отправь файл сюда: видео, аудио или документ")
+    await message.answer("📥 Отправь файл (видео / аудио)")
 
 
 # === FILE HANDLER ===
@@ -198,9 +198,6 @@ async def handle_files(message: Message):
     elif message.audio:
         await message.answer(f"🎧 AUDIO FILE_ID:\n{message.audio.file_id}")
 
-    else:
-        await message.answer("🤷 Не понял файл")
-
     user["debug_file_mode"] = False
     save_users(users)
 
@@ -208,11 +205,10 @@ async def handle_files(message: Message):
 # === CALLBACKS ===
 @dp.callback_query(F.data)
 async def callbacks_handler(callback: CallbackQuery):
-    action_name = callback.data
-
     program_data = load_program()
     actions = program_data.get("actions", {})
-    action = actions.get(action_name)
+
+    action = actions.get(callback.data)
 
     if not action:
         await callback.answer("Неизвестное действие")
@@ -220,13 +216,12 @@ async def callbacks_handler(callback: CallbackQuery):
 
     user = get_user(callback.from_user.id)
 
-    save_answer = action.get("save_answer")
-    if save_answer:
-        user["answers"][save_answer["key"]] = save_answer["value"]
+    if "save_answer" in action:
+        user["answers"][action["save_answer"]["key"]] = action["save_answer"]["value"]
         save_users(users)
 
     response = action.get("response")
-    if response and response["type"] == "text":
+    if response:
         await callback.message.answer(response["text"])
 
     await callback.answer()
@@ -245,46 +240,38 @@ async def scheduler():
 
                 started_at = datetime.fromisoformat(user["started_at"])
                 now = datetime.utcnow()
-                days_since_start = (now.date() - started_at.date()).days + 1
+                day = (now.date() - started_at.date()).days + 1
 
-                for day_str, day_data in days.items():
-                    day_num = int(day_str)
+                day_data = days.get(str(day))
+                if not day_data:
+                    continue
 
-                    if day_num != days_since_start:
+                for event in day_data.get("events", []):
+                    event_id = f"{day}:{event['id']}"
+
+                    if event_id in user["sent_events"]:
                         continue
 
-                    events = day_data.get("events", [])
+                    should_send = False
 
-                    for event in events:
-                        event_id = f"{day_num}:{event['id']}"
+                    if "delay_minutes" in event and day == 1:
+                        target = started_at + timedelta(minutes=event["delay_minutes"])
+                        if now >= target:
+                            should_send = True
 
-                        if event_id in user["sent_events"]:
-                            continue
+                    elif "time" in event:
+                        hh, mm = map(int, event["time"].split(":"))
+                        target = datetime.combine(now.date(), datetime.min.time()).replace(hour=hh, minute=mm)
+                        if now >= target:
+                            should_send = True
 
-                        should_send = False
-
-                        if "delay_minutes" in event and day_num == 1:
-                            target_time = started_at + timedelta(minutes=event["delay_minutes"])
-                            if now >= target_time:
-                                should_send = True
-
-                        elif "time" in event:
-                            hh, mm = map(int, event["time"].split(":"))
-                            target_time = datetime.combine(
-                                now.date(),
-                                datetime.min.time(),
-                            ).replace(hour=hh, minute=mm)
-
-                            if now >= target_time:
-                                should_send = True
-
-                        if should_send:
-                            await send_event(int(uid), day_num, event)
-                            user["sent_events"].append(event_id)
-                            save_users(users)
+                    if should_send:
+                        await send_event(int(uid), day, event)
+                        user["sent_events"].append(event_id)
+                        save_users(users)
 
         except Exception as e:
-            print(f"❌ SCHEDULER ERROR: {e}", flush=True)
+            print("❌ ERROR:", e, flush=True)
 
         await asyncio.sleep(60)
 
