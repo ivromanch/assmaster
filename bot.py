@@ -134,15 +134,8 @@ async def debug_next(message: Message):
     program_data = load_program()
     days = program_data.get("days", {})
 
-    started_at = datetime.fromisoformat(user["started_at"])
-    now = datetime.utcnow()
-    current_day = (now.date() - started_at.date()).days + 1
-
     for day_str, day_data in days.items():
         day_num = int(day_str)
-
-        if day_num < current_day:
-            continue
 
         for event in day_data.get("events", []):
             event_id = f"{day_num}:{event['id']}"
@@ -169,7 +162,7 @@ async def debug_reset(message: Message):
 
     save_users(users)
 
-    await message.answer("🔄 Сброс. Начни заново с /next")
+    await message.answer("🔄 Сброс. Начни заново с /start")
 
 
 @dp.message(Command("fileid"))
@@ -227,7 +220,7 @@ async def callbacks_handler(callback: CallbackQuery):
     await callback.answer()
 
 
-# === SCHEDULER ===
+# === SCHEDULER (FIXED) ===
 async def scheduler():
     while True:
         try:
@@ -240,40 +233,50 @@ async def scheduler():
 
                 started_at = datetime.fromisoformat(user["started_at"])
                 now = datetime.utcnow()
-                day = (now.date() - started_at.date()).days + 1
 
-                day_data = days.get(str(day))
-                if not day_data:
-                    continue
+                # считаем текущий день
+                current_day = (now.date() - started_at.date()).days + 1
 
-                for event in day_data.get("events", []):
-                    event_id = f"{day}:{event['id']}"
+                for day_str, day_data in days.items():
+                    day_num = int(day_str)
 
-                    if event_id in user["sent_events"]:
+                    if day_num != current_day:
                         continue
 
-                    should_send = False
+                    for event in day_data.get("events", []):
+                        event_id = f"{day_num}:{event['id']}"
 
-                    if "delay_minutes" in event and day == 1:
-                        target = started_at + timedelta(minutes=event["delay_minutes"])
-                        if now >= target:
-                            should_send = True
+                        if event_id in user["sent_events"]:
+                            continue
 
-                    elif "time" in event:
-                        hh, mm = map(int, event["time"].split(":"))
-                        target = datetime.combine(now.date(), datetime.min.time()).replace(hour=hh, minute=mm)
-                        if now >= target:
-                            should_send = True
+                        should_send = False
 
-                    if should_send:
-                        await send_event(int(uid), day, event)
-                        user["sent_events"].append(event_id)
-                        save_users(users)
+                        # delay события (первый день)
+                        if "delay_minutes" in event:
+                            target = started_at + timedelta(minutes=event["delay_minutes"])
+                            if now >= target:
+                                should_send = True
+
+                        # события по времени
+                        elif "time" in event:
+                            hh, mm = map(int, event["time"].split(":"))
+                            target = datetime.combine(
+                                now.date(),
+                                datetime.min.time()
+                            ).replace(hour=hh, minute=mm)
+
+                            if now >= target:
+                                should_send = True
+
+                        if should_send:
+                            await send_event(int(uid), day_num, event)
+                            user["sent_events"].append(event_id)
+                            save_users(users)
 
         except Exception as e:
             print("❌ ERROR:", e, flush=True)
 
-        await asyncio.sleep(60)
+        await asyncio.sleep(10)  # быстрее проверяем
 
 
 # === MAIN ===
